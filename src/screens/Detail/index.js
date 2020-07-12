@@ -1,10 +1,11 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-export default function Detail() {
+export default function Detail({ nav }) {
+  const { data } = nav.params;
   return (
     <View>
-      <Text>Detail</Text>
+      <Text>{JSON.stringify(data)}</Text>
     </View>
   );
 }

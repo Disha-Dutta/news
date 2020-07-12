@@ -6,6 +6,7 @@ import Item from "../../components/Item";
 export default function Home({ navigation }) {
   const [pageCount, setPageCount] = useState(0);
   const [posts, setPosts] = useState(null);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchURL =
@@ -20,12 +21,14 @@ export default function Home({ navigation }) {
 
     return () => {
       clearInterval(interval);
+      setLoading(false);
     };
   }, []);
 
   useEffect(() => {
     console.log(pageCount);
     if (pageCount > 0) {
+      setLoading(true);
       Axios.get(
         `https://hn.algolia.com/api/v1/search_by_date?tags=story&page=${pageCount}`
       ).then((resp) => {
@@ -37,13 +40,16 @@ export default function Home({ navigation }) {
         setPosts([...posts, ...newStories]);
       });
     }
+    return () => {
+      setLoading(false);
+    };
   }, [pageCount]);
 
   const getUpdatedData = () => {
     setPageCount(pageCount + 1);
   };
 
-  if (!posts)
+  if (!posts || isLoading)
     return (
       <ActivityIndicator
         color="#0000ff"
@@ -56,7 +62,7 @@ export default function Home({ navigation }) {
     <SafeAreaView>
       <FlatList
         data={posts}
-        renderItem={({ item, index, separators }) => (
+        renderItem={({ item }) => (
           <Item
             title={item.title}
             URL={item.url}
